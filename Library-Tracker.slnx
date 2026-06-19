@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="app.ts" />
+    <File Path="backend/src/.gitignore" />
+    <File Path="backend/src/package.json" />
+    <File Path="backend/src/tsconfig.json" />
+    <File Path="data.ts" />
+    <File Path="index.html" />
+    <File Path="README.md" />
+    <File Path="styles.css" />
+    <File Path="types.ts" />
+  </Folder>
+</Solution>
