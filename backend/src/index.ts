@@ -4,7 +4,7 @@ import { InMemoryBookRepository } from './repositories/BookRepository';
 import { BookService } from './services/BookServices';
 import { MongoBookRepository } from './repositories/MongoBookRepository';
 import { connectToDatabase, closeDatabaseConnection } from './infrastructure/database/mongodb';
-import { seedDatabase } from './seed'
+import { seedDatabase } from './seed';
 
 const app = express();
 const PORT = 3000;

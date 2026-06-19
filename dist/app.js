@@ -61,16 +61,38 @@ function handleSubmit(event) {
 }
 function renderBookList() {
     bookList.innerHTML = '';
+    if (books.length === 0) {
+        bookList.innerHTML = '<p class="empty-state">No books in the library yet.</p>';
+        return;
+    }
     let htmlString = "";
     books.forEach((book, index) => {
-        htmlString += `<div> 
-        <h2>Book ${index + 1} :</h2>
-        <h3>${book.title}</h3>
-        <p>${book.author}</p>
-        <p>${book.genre}</p>
-        <p>${book.year}</p>
-        </div>`;
+        const statusClass = book.isAvailable ? 'available' : 'borrowed';
+        const statusText = book.isAvailable ? 'Available' : 'Borrowed';
+        htmlString += `<article class="book-card">
+        <h2>${index + 1}. ${book.title}</h2>
+        <div class="book-details">
+            <p class="book-row"><span class="book-label">Author</span><strong>${book.author}</strong></p>
+            <p class="book-row"><span class="book-label">Genre</span><strong>${book.genre}</strong></p>
+            <p class="book-row"><span class="book-label">Year</span><strong>${book.year}</strong></p>
+        </div>
+        <p class="book-status ${statusClass}">Status: ${statusText}</p>
+        <div class="book-actions">
+            <button class="borrow-btn" data-id="${book.id}" data-action="borrow" ${book.isAvailable ? '' : 'disabled'}>Borrow</button>
+            <button class="return-btn" data-id="${book.id}" data-action="return" ${book.isAvailable ? 'disabled' : ''}>Return</button>
+        </div>
+        </article>`;
     });
     bookList.innerHTML = htmlString;
     console.log('Rendering Books:', books);
 }
+bookList.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-action]');
+    if (!btn)
+        return;
+    const book = books.find((b) => String(b.id) === btn.dataset.id);
+    if (!book)
+        return;
+    book.isAvailable = btn.dataset.action === 'return';
+    renderBookList();
+});

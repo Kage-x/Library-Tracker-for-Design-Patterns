@@ -481,4 +481,7 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
+# Cursor personal AI rules
+.cursor/rules/ponytail.mdc
+
 .vs/
