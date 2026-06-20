@@ -1,5 +1,5 @@
-import sampleBooks from './data.js';
-let books = sampleBooks;
+const API_BASE = 'http://localhost:3000/api';
+let books = [];
 const formInput = document.getElementById('bookForm');
 const titleInput = document.getElementById('titleInput');
 const authorInput = document.getElementById('authorInput');
@@ -7,10 +7,21 @@ const genreInput = document.getElementById('genreInput');
 const yearInput = document.getElementById('yearInput');
 const bookList = document.getElementById('bookList');
 const errorMessage = document.getElementById('errorMessage');
-const button = document.getElementById('bookButton');
 formInput.addEventListener('submit', handleSubmit);
-renderBookList();
-function handleSubmit(event) {
+loadBooks();
+async function loadBooks() {
+    try {
+        const response = await fetch(`${API_BASE}/books`);
+        if (!response.ok)
+            throw new Error('Failed to load books');
+        books = await response.json();
+        renderBookList();
+    }
+    catch (error) {
+        errorMessage.innerHTML = error.message;
+    }
+}
+async function handleSubmit(event) {
     event.preventDefault();
     const title = titleInput.value;
     const author = authorInput.value;
@@ -19,16 +30,16 @@ function handleSubmit(event) {
     errorMessage.innerHTML = '';
     const errors = [];
     if (title.trim() === "") {
-        errors.push("Title is reuqired");
+        errors.push("Title is required");
     }
     if (genre.trim() === "") {
-        errors.push("Genre is reuqired");
+        errors.push("Genre is required");
     }
     if (author.trim() === "") {
         errors.push("Author is required");
     }
-    if (yearNum === null) {
-        errors.push("Year is reuqired");
+    if (yearInput.value === "") {
+        errors.push("Year is required");
     }
     else if (isNaN(yearNum)) {
         errors.push("Year must be a number");
@@ -40,24 +51,28 @@ function handleSubmit(event) {
         errors.push("Year cannot exceed current year");
     }
     if (errors.length > 0) {
-        //Display errors
         errorMessage.innerHTML = errors.join('<br>');
         return;
     }
-    const newBook = {
-        id: Date.now(),
-        title: title,
-        author: author,
-        genre: genre,
-        year: yearNum,
-        isAvailable: true
-    };
-    books.push(newBook);
-    titleInput.value = "";
-    authorInput.value = "";
-    genreInput.value = "";
-    yearInput.value = "";
-    renderBookList();
+    try {
+        const response = await fetch(`${API_BASE}/books`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: title.trim(), author: author.trim(), genre: genre.trim(), year: yearNum })
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to add book');
+        }
+        titleInput.value = "";
+        authorInput.value = "";
+        genreInput.value = "";
+        yearInput.value = "";
+        await loadBooks();
+    }
+    catch (error) {
+        errorMessage.innerHTML = error.message;
+    }
 }
 function renderBookList() {
     bookList.innerHTML = '';
@@ -84,15 +99,21 @@ function renderBookList() {
         </article>`;
     });
     bookList.innerHTML = htmlString;
-    console.log('Rendering Books:', books);
 }
-bookList.addEventListener('click', (event) => {
+bookList.addEventListener('click', async (event) => {
     const btn = event.target.closest('[data-action]');
     if (!btn)
         return;
-    const book = books.find((b) => String(b.id) === btn.dataset.id);
-    if (!book)
-        return;
-    book.isAvailable = btn.dataset.action === 'return';
-    renderBookList();
+    errorMessage.innerHTML = '';
+    try {
+        const response = await fetch(`${API_BASE}/books/${btn.dataset.id}/${btn.dataset.action}`, { method: 'PATCH' });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Action failed');
+        }
+        await loadBooks();
+    }
+    catch (error) {
+        errorMessage.innerHTML = error.message;
+    }
 });
