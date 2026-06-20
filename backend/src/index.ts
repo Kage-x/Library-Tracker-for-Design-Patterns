@@ -1,6 +1,5 @@
 import express from 'express';
 import bookRoutes from './routes/BookRoutes';
-import { InMemoryBookRepository } from './repositories/BookRepository';
 import { BookService } from './services/BookServices';
 import { MongoBookRepository } from './repositories/MongoBookRepository';
 import { connectToDatabase, closeDatabaseConnection } from './infrastructure/database/mongodb';

@@ -1,5 +1,5 @@
-import { Book, BookEntity } from '../domain/Book';
-import { IBookRepository, InMemoryBookRepository } from '../repositories/BookRepository';
+import { Book } from '../domain/Book';
+import { IBookRepository } from '../repositories/BookRepository';
 
 export class BookService {
     private static instance: BookService;
